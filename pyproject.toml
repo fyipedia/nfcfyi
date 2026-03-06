@@ -1,0 +1,90 @@
+[project]
+name = "nfcfyi"
+version = "0.1.0"
+description = "NFC chip encyclopedia API client — look up NFC Forum types, NDEF records, operating modes, ISO 14443, and FeliCa specifications from NFCFYI."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [{ name = "FYIPedia" }]
+keywords = [
+    "nfc",
+    "ndef",
+    "rfid",
+    "contactless",
+    "iso-14443",
+    "felica",
+    "nfc-forum",
+    "near-field-communication",
+    "api-client",
+    "reference",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+    "Environment :: Console",
+]
+dependencies = []
+
+[project.optional-dependencies]
+api = ["httpx>=0.27"]
+cli = ["typer>=0.15", "rich>=13.0"]
+mcp = ["mcp>=1.0"]
+all = ["nfcfyi[api,cli,mcp]"]
+
+[project.scripts]
+nfcfyi = "nfcfyi.cli:app"
+
+[project.entry-points."mcp.servers"]
+nfcfyi = "nfcfyi.mcp_server:mcp"
+
+[project.urls]
+Homepage = "https://nfcfyi.com"
+"Chip Explorer" = "https://nfcfyi.com/chip/"
+"Standards Reference" = "https://nfcfyi.com/standard/"
+Documentation = "https://nfcfyi.com/developers/"
+Repository = "https://github.com/fyipedia/nfcfyi"
+Issues = "https://github.com/fyipedia/nfcfyi/issues"
+Changelog = "https://github.com/fyipedia/nfcfyi/releases"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nfcfyi"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+ignore = ["RUF022"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+
+[dependency-groups]
+dev = [
+    "httpx>=0.27",
+    "mcp>=1.0",
+    "mypy>=1.19.1",
+    "pytest>=9.0.2",
+    "rich>=13.0",
+    "ruff>=0.15.4",
+    "typer>=0.15",
+]
