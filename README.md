@@ -1,6 +1,6 @@
 # nfcfyi
 
-[![PyPI](https://img.shields.io/pypi/v/nfcfyi)](https://pypi.org/project/nfcfyi/)
+[![PyPI version](https://agentgif.com/badge/pypi/nfcfyi/version.svg)](https://pypi.org/project/nfcfyi/)
 [![Python](https://img.shields.io/pypi/pyversions/nfcfyi)](https://pypi.org/project/nfcfyi/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
