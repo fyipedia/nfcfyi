@@ -7,9 +7,9 @@ Usage::
     from nfcfyi.api import NFCFYI
 
     with NFCFYI() as api:
-        results = api.search("ntag")
-        chip = api.chip("ntag215")
-        comparison = api.compare("ntag213", "ntag215")
+        items = api.list_chip_families()
+        detail = api.get_chip_family("example-slug")
+        results = api.search("query")
 """
 
 from __future__ import annotations
@@ -22,9 +22,8 @@ import httpx
 class NFCFYI:
     """API client for the nfcfyi.com REST API.
 
-    Provides access to 11 endpoints covering NFC chips, chip families,
-    standards, operating modes, NDEF record types, use cases, glossary terms,
-    search, comparison, and random discovery.
+    Provides typed access to all nfcfyi.com endpoints including
+    list, detail, and search operations.
 
     Args:
         base_url: API base URL. Defaults to ``https://nfcfyi.com``.
@@ -38,101 +37,137 @@ class NFCFYI:
     ) -> None:
         self._client = httpx.Client(base_url=base_url, timeout=timeout)
 
-    # -- HTTP helpers ----------------------------------------------------------
-
     def _get(self, path: str, **params: Any) -> dict[str, Any]:
-        resp = self._client.get(path, params={k: v for k, v in params.items() if v is not None})
+        resp = self._client.get(
+            path,
+            params={k: v for k, v in params.items() if v is not None},
+        )
         resp.raise_for_status()
         result: dict[str, Any] = resp.json()
         return result
 
-    # -- Endpoints -------------------------------------------------------------
+    # -- Endpoints -----------------------------------------------------------
 
-    def chip(self, slug: str) -> dict[str, Any]:
-        """Get NFC chip detail with specs, memory layout, and supported standards.
+    def list_chip_families(self, **params: Any) -> dict[str, Any]:
+        """List all chip families."""
+        return self._get("/api/v1/chip-families/", **params)
 
-        Args:
-            slug: Chip URL slug (e.g. ``"ntag213"``, ``"ntag215"``, ``"st25ta02k"``).
-        """
-        return self._get(f"/api/chip/{slug}/")
+    def get_chip_family(self, slug: str) -> dict[str, Any]:
+        """Get chip family by slug."""
+        return self._get(f"/api/v1/chip-families/" + slug + "/")
 
-    def chip_family(self, slug: str) -> dict[str, Any]:
-        """Get chip family with product line overview and member chips.
+    def list_chips(self, **params: Any) -> dict[str, Any]:
+        """List all chips."""
+        return self._get("/api/v1/chips/", **params)
 
-        Args:
-            slug: Family URL slug (e.g. ``"ntag-21x"``, ``"mifare-ultralight"``).
-        """
-        return self._get(f"/api/chip-family/{slug}/")
+    def get_chip(self, slug: str) -> dict[str, Any]:
+        """Get chip by slug."""
+        return self._get(f"/api/v1/chips/" + slug + "/")
 
-    def standard(self, slug: str) -> dict[str, Any]:
-        """Get NFC standard detail with linked chips and protocols.
+    def list_faqs(self, **params: Any) -> dict[str, Any]:
+        """List all faqs."""
+        return self._get("/api/v1/faqs/", **params)
 
-        Args:
-            slug: Standard URL slug (e.g. ``"iso-14443"``, ``"iso-15693"``).
-        """
-        return self._get(f"/api/standard/{slug}/")
+    def get_faq(self, slug: str) -> dict[str, Any]:
+        """Get faq by slug."""
+        return self._get(f"/api/v1/faqs/" + slug + "/")
 
-    def operating_mode(self, slug: str) -> dict[str, Any]:
-        """Get NFC operating mode detail with protocol flow and use cases.
+    def list_frequency_bands(self, **params: Any) -> dict[str, Any]:
+        """List all frequency bands."""
+        return self._get("/api/v1/frequency-bands/", **params)
 
-        Args:
-            slug: Operating mode URL slug (e.g. ``"read-write"``, ``"card-emulation"``).
-        """
-        return self._get(f"/api/operating-mode/{slug}/")
+    def get_frequency_band(self, slug: str) -> dict[str, Any]:
+        """Get frequency band by slug."""
+        return self._get(f"/api/v1/frequency-bands/" + slug + "/")
 
-    def ndef_type(self, slug: str) -> dict[str, Any]:
-        """Get NDEF record type detail with encoding format and examples.
+    def list_glossary(self, **params: Any) -> dict[str, Any]:
+        """List all glossary."""
+        return self._get("/api/v1/glossary/", **params)
 
-        Args:
-            slug: NDEF type URL slug (e.g. ``"text"``, ``"uri"``, ``"smart-poster"``).
-        """
-        return self._get(f"/api/ndef-type/{slug}/")
+    def get_term(self, slug: str) -> dict[str, Any]:
+        """Get term by slug."""
+        return self._get(f"/api/v1/glossary/" + slug + "/")
 
-    def use_case(self, slug: str) -> dict[str, Any]:
-        """Get NFC use case detail with recommended chips and implementation notes.
+    def list_guides(self, **params: Any) -> dict[str, Any]:
+        """List all guides."""
+        return self._get("/api/v1/guides/", **params)
 
-        Args:
-            slug: Use case URL slug (e.g. ``"access-control"``, ``"payments"``).
-        """
-        return self._get(f"/api/use-case/{slug}/")
+    def get_guide(self, slug: str) -> dict[str, Any]:
+        """Get guide by slug."""
+        return self._get(f"/api/v1/guides/" + slug + "/")
 
-    def glossary_term(self, slug: str) -> dict[str, Any]:
-        """Get glossary term definition for tooltips and reference.
+    def list_manufacturers(self, **params: Any) -> dict[str, Any]:
+        """List all manufacturers."""
+        return self._get("/api/v1/manufacturers/", **params)
 
-        Args:
-            slug: Term URL slug (e.g. ``"ndef"``, ``"anti-collision"``, ``"atqa"``).
-        """
-        return self._get(f"/api/term/{slug}/")
+    def get_manufacturer(self, slug: str) -> dict[str, Any]:
+        """Get manufacturer by slug."""
+        return self._get(f"/api/v1/manufacturers/" + slug + "/")
 
-    def search(self, query: str) -> dict[str, Any]:
-        """Search across chips, standards, NDEF types, use cases, and glossary terms.
+    def list_ndef_types(self, **params: Any) -> dict[str, Any]:
+        """List all ndef types."""
+        return self._get("/api/v1/ndef-types/", **params)
 
-        Args:
-            query: Search term (minimum 2 characters).
-        """
-        return self._get("/api/search/", q=query)
+    def get_ndef_type(self, slug: str) -> dict[str, Any]:
+        """Get ndef type by slug."""
+        return self._get(f"/api/v1/ndef-types/" + slug + "/")
 
-    def compare(self, slug_a: str, slug_b: str) -> dict[str, Any]:
-        """Compare two NFC chips side by side.
+    def list_operating_modes(self, **params: Any) -> dict[str, Any]:
+        """List all operating modes."""
+        return self._get("/api/v1/operating-modes/", **params)
 
-        Args:
-            slug_a: First chip slug (e.g. ``"ntag213"``).
-            slug_b: Second chip slug (e.g. ``"ntag215"``).
-        """
-        return self._get("/api/compare/", a=slug_a, b=slug_b)
+    def get_operating_mode(self, slug: str) -> dict[str, Any]:
+        """Get operating mode by slug."""
+        return self._get(f"/api/v1/operating-modes/" + slug + "/")
 
-    def random(self) -> dict[str, Any]:
-        """Get a random NFC chip with full detail."""
-        return self._get("/api/random/")
+    def list_security_protocols(self, **params: Any) -> dict[str, Any]:
+        """List all security protocols."""
+        return self._get("/api/v1/security-protocols/", **params)
 
-    def openapi(self) -> dict[str, Any]:
-        """Get the OpenAPI 3.1.0 specification."""
-        return self._get("/api/openapi.json")
+    def get_security_protocol(self, slug: str) -> dict[str, Any]:
+        """Get security protocol by slug."""
+        return self._get(f"/api/v1/security-protocols/" + slug + "/")
 
-    # -- Context manager -------------------------------------------------------
+    def list_standards(self, **params: Any) -> dict[str, Any]:
+        """List all standards."""
+        return self._get("/api/v1/standards/", **params)
+
+    def get_standard(self, slug: str) -> dict[str, Any]:
+        """Get standard by slug."""
+        return self._get(f"/api/v1/standards/" + slug + "/")
+
+    def list_tag_types(self, **params: Any) -> dict[str, Any]:
+        """List all tag types."""
+        return self._get("/api/v1/tag-types/", **params)
+
+    def get_tag_type(self, slug: str) -> dict[str, Any]:
+        """Get tag type by slug."""
+        return self._get(f"/api/v1/tag-types/" + slug + "/")
+
+    def list_tools(self, **params: Any) -> dict[str, Any]:
+        """List all tools."""
+        return self._get("/api/v1/tools/", **params)
+
+    def get_tool(self, slug: str) -> dict[str, Any]:
+        """Get tool by slug."""
+        return self._get(f"/api/v1/tools/" + slug + "/")
+
+    def list_use_cases(self, **params: Any) -> dict[str, Any]:
+        """List all use cases."""
+        return self._get("/api/v1/use-cases/", **params)
+
+    def get_use_case(self, slug: str) -> dict[str, Any]:
+        """Get use case by slug."""
+        return self._get(f"/api/v1/use-cases/" + slug + "/")
+
+    def search(self, query: str, **params: Any) -> dict[str, Any]:
+        """Search across all content."""
+        return self._get(f"/api/v1/search/", q=query, **params)
+
+    # -- Lifecycle -----------------------------------------------------------
 
     def close(self) -> None:
-        """Close the underlying HTTP connection."""
+        """Close the underlying HTTP client."""
         self._client.close()
 
     def __enter__(self) -> NFCFYI:
