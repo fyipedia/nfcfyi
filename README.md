@@ -6,7 +6,7 @@
 
 NFC chip encyclopedia API client for Python. Look up NFC chips, NDEF record types, operating modes, standards, and contactless use cases from [NFCFYI](https://nfcfyi.com) -- the comprehensive NFC reference covering NFC Forum Tag Types 1-5, ISO 14443 A/B, FeliCa, MIFARE, NTAG, and every major chip family in commercial and industrial use.
 
-> **Explore NFC at [nfcfyi.com](https://nfcfyi.com)** -- [Chip Explorer](https://nfcfyi.com/chip/) | [Standards Reference](https://nfcfyi.com/standard/) | [NDEF Types](https://nfcfyi.com/ndef-type/) | [Use Cases](https://nfcfyi.com/use-case/)
+> **Explore NFC at [nfcfyi.com](https://nfcfyi.com)** -- [Chip Explorer](https://nfcfyi.com/chip/) | [Standards Reference](https://nfcfyi.com/standard/) | | [Use Cases](https://nfcfyi.com/use-case/)
 
 ## Install
 
@@ -105,9 +105,7 @@ Major NFC chip product lines from leading manufacturers:
 | FeliCa | Sony | Type 3 | Suica, PASMO, high-speed transit in Japan |
 | ICODE | NXP | Type 5 | Library books, logistics, longer range |
 
-Learn more: [Chip Explorer](https://nfcfyi.com/chip/) | [Standards Reference](https://nfcfyi.com/standard/) | [NDEF Types](https://nfcfyi.com/ndef-type/)
-
-## API Endpoints
+Learn more: [Chip Explorer](https://nfcfyi.com/chip/) | [Standards Reference](https://nfcfyi.com/standard/) | ## API Endpoints
 
 Free, no authentication required. JSON responses with CORS enabled.
 
