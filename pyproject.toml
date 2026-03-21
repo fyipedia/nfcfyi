@@ -1,6 +1,6 @@
 [project]
 name = "nfcfyi"
-version = "0.1.0"
+version = "0.1.1"
 description = "NFC chip encyclopedia API client — look up NFC Forum types, NDEF records, operating modes, ISO 14443, and FeliCa specifications from NFCFYI."
 readme = "README.md"
 license = "MIT"
@@ -42,6 +42,7 @@ all = ["nfcfyi[api,cli,mcp]"]
 
 [project.scripts]
 nfcfyi = "nfcfyi.cli:app"
+nfcfyi-mcp = "nfcfyi.mcp_server:main"
 
 [project.entry-points."mcp.servers"]
 nfcfyi = "nfcfyi.mcp_server:mcp"

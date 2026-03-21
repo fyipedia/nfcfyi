@@ -1,144 +1,88 @@
-"""MCP server for nfcfyi — NFC chip and NDEF tools for AI assistants.
+"""MCP server for nfcfyi — AI assistant tools for nfcfyi.com.
 
-Requires the ``mcp`` extra: ``pip install nfcfyi[mcp]``
-
-Run as a standalone server::
-
-    python -m nfcfyi.mcp_server
-
-Or configure in ``claude_desktop_config.json``::
-
-    {
-        "mcpServers": {
-            "nfcfyi": {
-                "command": "python",
-                "args": ["-m", "nfcfyi.mcp_server"]
-            }
-        }
-    }
+Run: uvx --from "nfcfyi[mcp]" python -m nfcfyi.mcp_server
 """
-
 from __future__ import annotations
 
 from mcp.server.fastmcp import FastMCP
 
-mcp = FastMCP("nfcfyi")
+mcp = FastMCP("NFCFYI")
 
 
 @mcp.tool()
-def nfc_search(query: str) -> str:
-    """Search for NFC chips, standards, NDEF types, and terminology on NFCFYI.
-
-    Search across NFC chips (NTAG, MIFARE, ST25), standards (ISO 14443, ISO 15693),
-    NDEF record types, operating modes, use cases, and glossary terms.
+def list_chips(limit: int = 20, offset: int = 0) -> str:
+    """List chips from nfcfyi.com.
 
     Args:
-        query: Search term (e.g. "ntag", "iso 14443", "ndef", "card emulation").
+        limit: Maximum number of results. Default 20.
+        offset: Number of results to skip. Default 0.
     """
     from nfcfyi.api import NFCFYI
 
     with NFCFYI() as api:
-        results = api.search(query)
-
-    items = results.get("results", [])
-    if not items:
-        return f"No results found for '{query}'."
-
-    lines = [
-        f"## NFC Search: {query}",
-        "",
-        f"Found {len(items)} result(s):",
-        "",
-        "| Type | Name | Slug |",
-        "|------|------|------|",
-    ]
-
-    for item in items:
-        t, n, s = item.get("type", ""), item.get("name", ""), item.get("slug", "")
-        lines.append(f"| {t} | {n} | {s} |")
-
-    return "\n".join(lines)
+        data = api.list_chips(limit=limit, offset=offset)
+        results = data.get("results", data) if isinstance(data, dict) else data
+        if not results:
+            return "No chips found."
+        items = results[:limit] if isinstance(results, list) else []
+        return "\n".join(f"- {item.get('name', item.get('slug', '?'))}" for item in items)
 
 
 @mcp.tool()
-def nfc_lookup(slug: str) -> str:
-    """Look up a specific NFC chip by slug.
-
-    Returns full specifications including memory size, NFC Forum type,
-    operating frequency, supported standards, and use cases.
+def get_chip(slug: str) -> str:
+    """Get detailed information about a specific chip.
 
     Args:
-        slug: Chip slug (e.g. "ntag213", "ntag215", "mifare-ultralight-c", "st25ta02k").
+        slug: URL slug identifier for the chip.
     """
     from nfcfyi.api import NFCFYI
 
     with NFCFYI() as api:
-        data = api.chip(slug)
-
-    lines = [
-        f"## {data.get('name', slug)}",
-        "",
-        data.get("description", ""),
-        "",
-        f"- **Manufacturer**: {data.get('manufacturer', 'N/A')}",
-        f"- **NFC Forum Type**: {data.get('nfc_forum_type', 'N/A')}",
-        f"- **Memory Size**: {data.get('memory_size', 'N/A')}",
-        f"- **User Memory**: {data.get('user_memory', 'N/A')}",
-        f"- **Operating Frequency**: {data.get('operating_frequency', 'N/A')}",
-        f"- **Data Transfer Rate**: {data.get('data_transfer_rate', 'N/A')}",
-        f"- **UID Length**: {data.get('uid_length', 'N/A')}",
-    ]
-
-    standards = data.get("standards", [])
-    if standards:
-        lines.append("")
-        lines.append("### Standards")
-        for st in standards:
-            lines.append(f"- {st.get('name', '')} ({st.get('organization', '')})")
-
-    return "\n".join(lines)
+        data = api.get_chip(slug)
+        return str(data)
 
 
 @mcp.tool()
-def nfc_compare(slug_a: str, slug_b: str) -> str:
-    """Compare two NFC chips side by side.
+def list_ndef_types(limit: int = 20, offset: int = 0) -> str:
+    """List ndef_types from nfcfyi.com.
 
     Args:
-        slug_a: First chip slug (e.g. "ntag213").
-        slug_b: Second chip slug (e.g. "ntag215").
+        limit: Maximum number of results. Default 20.
+        offset: Number of results to skip. Default 0.
     """
     from nfcfyi.api import NFCFYI
 
     with NFCFYI() as api:
-        data = api.compare(slug_a, slug_b)
+        data = api.list_ndef_types(limit=limit, offset=offset)
+        results = data.get("results", data) if isinstance(data, dict) else data
+        if not results:
+            return "No ndef_types found."
+        items = results[:limit] if isinstance(results, list) else []
+        return "\n".join(f"- {item.get('name', item.get('slug', '?'))}" for item in items)
 
-    a = data.get("a", {})
-    b = data.get("b", {})
 
-    lines = [
-        f"## {a.get('name', slug_a)} vs {b.get('name', slug_b)}",
-        "",
-        "| Property | " + a.get("name", slug_a) + " | " + b.get("name", slug_b) + " |",
-        "|----------|"
-        + "-" * len(a.get("name", slug_a))
-        + "--|"
-        + "-" * len(b.get("name", slug_b))
-        + "--|",
-    ]
+@mcp.tool()
+def search_nfc(query: str) -> str:
+    """Search nfcfyi.com for NFC chips, NDEF types, and manufacturers.
 
-    fields = [
-        ("Manufacturer", "manufacturer"),
-        ("NFC Forum Type", "nfc_forum_type"),
-        ("Memory Size", "memory_size"),
-        ("User Memory", "user_memory"),
-        ("Frequency", "operating_frequency"),
-        ("UID Length", "uid_length"),
-    ]
-    for label, key in fields:
-        lines.append(f"| {label} | {a.get(key, '-')} | {b.get(key, '-')} |")
+    Args:
+        query: Search query string.
+    """
+    from nfcfyi.api import NFCFYI
 
-    return "\n".join(lines)
+    with NFCFYI() as api:
+        data = api.search(query)
+        results = data.get("results", data) if isinstance(data, dict) else data
+        if not results:
+            return f"No results found for \"{query}\"."
+        items = results[:10] if isinstance(results, list) else []
+        return "\n".join(f"- {item.get('name', item.get('slug', '?'))}" for item in items)
+
+
+def main() -> None:
+    """Run the MCP server."""
+    mcp.run()
 
 
 if __name__ == "__main__":
-    mcp.run()
+    main()
