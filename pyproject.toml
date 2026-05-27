@@ -1,6 +1,6 @@
 [project]
 name = "nfcfyi"
-version = "0.1.1"
+version = "0.1.2"
 description = "NFC chip encyclopedia API client — look up NFC Forum types, NDEF records, operating modes, ISO 14443, and FeliCa specifications from NFCFYI."
 readme = "README.md"
 license = "MIT"
