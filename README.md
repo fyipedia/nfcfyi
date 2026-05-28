@@ -303,6 +303,15 @@ Embed [NFCFYI](https://nfcfyi.com) widgets on any website with [nfcfyi-embed](ht
 
 Zero dependencies · Shadow DOM · 4 themes (light/dark/sepia/auto) · [Widget docs](https://widget.nfcfyi.com)
 
+## Recently Updated (v0.1.2)
+
+Latest content state on [https://nfcfyi.com](https://nfcfyi.com):
+- [Homepage](https://nfcfyi.com)
+- [Developer documentation](https://nfcfyi.com/developers/)
+- [Sitemap (full content index)](https://nfcfyi.com/sitemap.xml)
+
+Version bumped 2026-05-27 as part of the FYIPedia [SEO recovery refresh](https://github.com/dobestan).
+
 ## License
 
 MIT
